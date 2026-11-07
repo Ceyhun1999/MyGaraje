@@ -10,6 +10,9 @@ struct AddCarView: View {
 
     // MARK: - State
     @State private var selectedPhoto: PhotosPickerItem?
+    
+    @State private var showErrorAlert = false
+    @State private var errorMessage = ""
 
     @State private var selectedBrand = ""
     @State private var selectedModel = ""
@@ -58,6 +61,11 @@ struct AddCarView: View {
             .onAppear {
                 print("Database folder:", URL.applicationSupportDirectory.path)
             }
+            .alert("Проверьте данные", isPresented: $showErrorAlert) {
+                Button("Понятно", role: .cancel) {}
+            } message: {
+                Text(errorMessage)
+            }
         }
     }
 
@@ -86,36 +94,34 @@ struct AddCarView: View {
 
     // MARK: - Actions
     private func saveCar() {
-
         guard !selectedBrand.isEmpty else {
-            print("Brend secin")
+            showError("Выберите марку автомобиля")
             return
         }
 
         guard !selectedModel.isEmpty else {
-            print("Model secin")
+            showError("Выберите модель автомобиля")
             return
         }
 
         guard selectedYear > 0 else {
-            print("Il secin")
+            showError("Выберите год выпуска")
             return
         }
 
         guard !selectedFuel.isEmpty else {
-            print("Yanacaq novunu secin")
+            showError("Выберите тип топлива")
             return
         }
 
         guard !selectedTransmission.isEmpty else {
-            print("Karabka novunu secin")
+            showError("Выберите коробку передач")
             return
         }
 
         guard let mileageValue = Int(mileage),
-            mileageValue >= 0
-        else {
-            print("Введите корректный пробег")
+              mileageValue >= 0 else {
+            showError("Введите корректный пробег")
             return
         }
 
@@ -125,8 +131,7 @@ struct AddCarView: View {
             year: selectedYear,
             fuelType: selectedFuel,
             transmission: selectedTransmission,
-            mileage: mileageValue,
-
+            mileage: mileageValue
         )
 
         modelContext.insert(car)
@@ -136,8 +141,15 @@ struct AddCarView: View {
             dismiss()
         } catch {
             modelContext.rollback()
+            showError("Не удалось сохранить автомобиль")
             print("Ошибка сохранения автомобиля: \(error)")
         }
+    }
+
+    
+    private func showError(_ message: String) {
+        errorMessage = message
+        showErrorAlert = true
     }
 
 }
