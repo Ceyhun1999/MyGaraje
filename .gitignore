@@ -1,0 +1,12 @@
+.DS_Store
+build/
+DerivedData/
+xcuserdata/
+*.xcuserstate
+*.xcscmblueprint
+*.xccheckout
+.build/
+.env
+.env.*
+!.env.example
+MyGarage-design-changes.pdf
