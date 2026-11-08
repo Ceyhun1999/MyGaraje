@@ -1,6 +1,8 @@
-import Foundation
 import Observation
+import PhotosUI
 import SwiftData
+import SwiftUI
+import UIKit
 
 @MainActor
 @Observable
@@ -16,6 +18,8 @@ final class AddCarViewModel {
     let catalog = CarCatalog()
 
     // MARK: - State
+    private(set) var isSaving = false
+
     var selectedBrand = ""
     var selectedModel = ""
     var selectedYear = 0
@@ -24,7 +28,19 @@ final class AddCarViewModel {
     var mileage = ""
 
     // MARK: - Actions
-    func saveCar(using modelContext: ModelContext) -> String? {
+    func saveCar(
+        using modelContext: ModelContext,
+        selectedPhoto: PhotosPickerItem?
+    ) async -> String? {
+        guard !isSaving else {
+            return "Сохранение уже выполняется"
+        }
+
+        isSaving = true
+        defer {
+            isSaving = false
+        }
+
         let mileageValue: Int
 
         switch validate() {
@@ -33,6 +49,30 @@ final class AddCarViewModel {
 
         case .invalid(let message):
             return message
+        }
+
+        // Load and compress the selected photo.
+        var photoData: Data?
+
+        if let selectedPhoto {
+            do {
+                guard
+                    let data = try await selectedPhoto.loadTransferable(
+                        type: Data.self
+                    ),
+                    let image = UIImage(data: data),
+                    let compressedData = image.jpegData(
+                        compressionQuality: 0.75
+                    )
+                else {
+                    return "Не удалось загрузить фотографию"
+                }
+
+                photoData = compressedData
+            } catch {
+                print("Ошибка загрузки фотографии: \(error)")
+                return "Не удалось загрузить фотографию"
+            }
         }
 
         let car = Car(
@@ -44,6 +84,8 @@ final class AddCarViewModel {
             mileage: mileageValue
         )
 
+        car.photoData = photoData
+
         modelContext.insert(car)
 
         do {
@@ -51,7 +93,7 @@ final class AddCarViewModel {
             return nil
         } catch {
             modelContext.rollback()
-            print("Ошибка сохранения: \(error)")
+            print("Ошибка сохранения автомобиля: \(error)")
             return "Не удалось сохранить автомобиль"
         }
     }

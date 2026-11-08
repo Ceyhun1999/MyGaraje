@@ -1,3 +1,4 @@
+import Foundation
 import SwiftData
 
 @Model
@@ -10,6 +11,9 @@ final class Car {
     var fuelType: String
     var transmission: String
     var mileage: Int
+
+    @Attribute(.externalStorage)
+    var photoData: Data? = nil
 
     // MARK: - Initialization
     init(

@@ -21,7 +21,7 @@ struct CarListView: View {
                             model: car.model,
                             year: car.year,
                             mileage: car.mileage,
-                            imageName: "carImage"
+                            photoData: car.photoData
                         )
                     }
                     .swipeActions(edge: .trailing, allowsFullSwipe: false) {

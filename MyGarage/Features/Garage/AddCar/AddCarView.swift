@@ -11,7 +11,6 @@ struct AddCarView: View {
     // MARK: - State
     @State private var viewModel = AddCarViewModel()
     @State private var selectedPhoto: PhotosPickerItem?
-
     @State private var showErrorAlert = false
     @State private var errorMessage = ""
 
@@ -19,19 +18,24 @@ struct AddCarView: View {
     var body: some View {
         NavigationStack {
             Form {
-                PhotoSectionView(selectedPhoto: $selectedPhoto)
+                PhotoSectionView(
+                    selectedPhoto: $selectedPhoto
+                )
+
                 CarSectionView(
                     selectedBrand: $viewModel.selectedBrand,
                     selectedModel: $viewModel.selectedModel,
                     selectedYear: $viewModel.selectedYear,
                     catalog: viewModel.catalog
                 )
+
                 CharacteristicsSectionView(
                     selectedFuel: $viewModel.selectedFuel,
                     selectedTransmission: $viewModel.selectedTransmission,
                     mileage: $viewModel.mileage,
                     catalog: viewModel.catalog
                 )
+
                 buttonsSection
             }
             .scrollIndicators(.hidden)
@@ -47,10 +51,10 @@ struct AddCarView: View {
                 for: .navigationBar
             )
             .toolbarBackground(.visible, for: .navigationBar)
-            .onAppear {
-                print("Database folder:", URL.applicationSupportDirectory.path)
-            }
-            .alert("Проверьте данные", isPresented: $showErrorAlert) {
+            .alert(
+                "Проверьте данные",
+                isPresented: $showErrorAlert
+            ) {
                 Button("Понятно", role: .cancel) {}
             } message: {
                 Text(errorMessage)
@@ -62,8 +66,11 @@ struct AddCarView: View {
     private var buttonsSection: some View {
         VStack(spacing: 12) {
             PrimaryButton(title: "Сохранить") {
-                saveCar()
+                Task {
+                    await saveCar()
+                }
             }
+            .disabled(viewModel.isSaving)
         }
         .padding(.top, 12)
         .listRowBackground(Color.clear)
@@ -81,8 +88,12 @@ struct AddCarView: View {
     }
 
     // MARK: - Actions
-    private func saveCar() {
-        if let error = viewModel.saveCar(using: modelContext) {
+    @MainActor
+    private func saveCar() async {
+        if let error = await viewModel.saveCar(
+            using: modelContext,
+            selectedPhoto: selectedPhoto
+        ) {
             showError(error)
             return
         }

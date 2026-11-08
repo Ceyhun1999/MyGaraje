@@ -7,15 +7,14 @@ struct CarRowView: View {
     let model: String
     let year: Int
     let mileage: Int
-    let imageName: String
+    let photoData: Data?
 
     // MARK: - Body
     var body: some View {
         HStack(spacing: 12) {
-            Image(imageName)
-                .resizable()
-                .scaledToFill()
+            CarPhotoView(photoData: photoData)
                 .frame(width: 110, height: 75)
+                .clipped()
                 .clipShape(RoundedRectangle(cornerRadius: 12))
 
             VStack(alignment: .leading, spacing: 5) {
@@ -29,16 +28,4 @@ struct CarRowView: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }
-}
-
-// MARK: - Preview
-#Preview {
-    CarRowView(
-        title: "BMW",
-        model: "320i",
-        year: 2020,
-        mileage: 48250,
-        imageName: "carImage"
-    )
-    .padding()
 }
