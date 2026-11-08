@@ -9,19 +9,11 @@ struct AddCarView: View {
     @Environment(\.modelContext) private var modelContext
 
     // MARK: - State
+    @State private var viewModel = AddCarViewModel()
     @State private var selectedPhoto: PhotosPickerItem?
-    
+
     @State private var showErrorAlert = false
     @State private var errorMessage = ""
-
-    @State private var selectedBrand = ""
-    @State private var selectedModel = ""
-    @State private var selectedYear = 0
-
-    @State private var selectedFuel = ""
-    @State private var selectedTransmission = ""
-
-    @State private var mileage = ""
 
     // MARK: - Data
     private let catalog = CarCatalog()
@@ -32,15 +24,15 @@ struct AddCarView: View {
             Form {
                 PhotoSectionView(selectedPhoto: $selectedPhoto)
                 CarSectionView(
-                    selectedBrand: $selectedBrand,
-                    selectedModel: $selectedModel,
-                    selectedYear: $selectedYear,
+                    selectedBrand: $viewModel.selectedBrand,
+                    selectedModel: $viewModel.selectedModel,
+                    selectedYear: $viewModel.selectedYear,
                     catalog: catalog
                 )
                 CharacteristicsSectionView(
-                    selectedFuel: $selectedFuel,
-                    selectedTransmission: $selectedTransmission,
-                    mileage: $mileage,
+                    selectedFuel: $viewModel.selectedFuel,
+                    selectedTransmission: $viewModel.selectedTransmission,
+                    mileage: $viewModel.mileage,
                     catalog: catalog
                 )
                 buttonsSection
@@ -72,7 +64,6 @@ struct AddCarView: View {
     // MARK: - Buttons Section
     private var buttonsSection: some View {
         VStack(spacing: 12) {
-
             PrimaryButton(title: "Сохранить") {
                 saveCar()
             }
@@ -92,45 +83,24 @@ struct AddCarView: View {
         .accessibilityLabel("Закрыть")
     }
 
-    // MARK: - Actions
     private func saveCar() {
-        guard !selectedBrand.isEmpty else {
-            showError("Выберите марку автомобиля")
+
+        if let error = viewModel.validate() {
+            showError(error)
             return
         }
 
-        guard !selectedModel.isEmpty else {
-            showError("Выберите модель автомобиля")
-            return
-        }
-
-        guard selectedYear > 0 else {
-            showError("Выберите год выпуска")
-            return
-        }
-
-        guard !selectedFuel.isEmpty else {
-            showError("Выберите тип топлива")
-            return
-        }
-
-        guard !selectedTransmission.isEmpty else {
-            showError("Выберите коробку передач")
-            return
-        }
-
-        guard let mileageValue = Int(mileage),
-              mileageValue >= 0 else {
+        guard let mileageValue = Int(viewModel.mileage) else {
             showError("Введите корректный пробег")
             return
         }
 
         let car = Car(
-            brand: selectedBrand,
-            model: selectedModel,
-            year: selectedYear,
-            fuelType: selectedFuel,
-            transmission: selectedTransmission,
+            brand: viewModel.selectedBrand,
+            model: viewModel.selectedModel,
+            year: viewModel.selectedYear,
+            fuelType: viewModel.selectedFuel,
+            transmission: viewModel.selectedTransmission,
             mileage: mileageValue
         )
 
@@ -142,16 +112,15 @@ struct AddCarView: View {
         } catch {
             modelContext.rollback()
             showError("Не удалось сохранить автомобиль")
-            print("Ошибка сохранения автомобиля: \(error)")
+            print("Ошибка сохранения: \(error)")
         }
     }
 
-    
+    // MARK: - Error Handling
     private func showError(_ message: String) {
         errorMessage = message
         showErrorAlert = true
     }
-
 }
 
 // MARK: - Preview

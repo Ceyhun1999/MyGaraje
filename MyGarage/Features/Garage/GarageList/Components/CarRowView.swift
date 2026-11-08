@@ -1,4 +1,3 @@
-
 import SwiftUI
 
 struct CarRowView: View {

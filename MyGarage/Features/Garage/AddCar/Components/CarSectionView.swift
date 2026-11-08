@@ -1,19 +1,18 @@
 import SwiftUI
 
 struct CarSectionView: View {
-    
+
     // MARK: - Bindings
     @Binding var selectedBrand: String
     @Binding var selectedModel: String
     @Binding var selectedYear: Int
-    
+
     // MARK: - Data
     let catalog: CarCatalog
-   
+
     // MARK: - Body
     var body: some View {
         Section("Автомобиль") {
-
             Picker("Марка", selection: $selectedBrand) {
                 Text("Выбрать").tag("")
 
@@ -28,8 +27,7 @@ struct CarSectionView: View {
             Picker("Модель", selection: $selectedModel) {
                 Text("Выбрать").tag("")
 
-                ForEach(catalog.models(for: selectedBrand), id: \.self) {
-                    model in
+                ForEach(catalog.models(for: selectedBrand), id: \.self) { model in
                     Text(model).tag(model)
                 }
             }

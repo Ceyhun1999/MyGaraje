@@ -8,7 +8,6 @@ struct PhotoSectionView: View {
 
     // MARK: - Body
     var body: some View {
-
         PhotosPicker(
             selection: $selectedPhoto,
             matching: .images
@@ -30,6 +29,5 @@ struct PhotoSectionView: View {
         }
         .buttonStyle(.plain)
         .listRowBackground(Color.clear)
-
     }
 }

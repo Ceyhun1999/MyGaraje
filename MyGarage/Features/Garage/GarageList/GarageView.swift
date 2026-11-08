@@ -1,24 +1,29 @@
-import SwiftData
 import SwiftUI
+import SwiftData
 
 struct GarageView: View {
+
+    // MARK: - Environment
+    @Environment(\.modelContext) private var modelContext
 
     // MARK: - Data
     @Query private var cars: [Car]
 
     // MARK: - State
-    @State private var showAddCar: Bool = false
-    @State private var carToDelete: Car?
-    @State private var showDeleteAlert = false
+    @State private var viewModel = GarageListViewModel()
 
-    // MARK: - Environment
-    @Environment(\.modelContext) private var modelContext
+    @State private var showAddCar = false
+    @State private var showDeleteAlert = false
+    @State private var showErrorAlert = false
+    @State private var pendingErrorAlert = false
 
     // MARK: - Body
     var body: some View {
         Group {
             if cars.isEmpty {
-                emptyGarageView
+                EmptyGarageSectionView {
+                    showAddCar = true
+                }
             } else {
                 carsListView
             }
@@ -33,13 +38,48 @@ struct GarageView: View {
         )
         .navigationTitle("Мой гараж")
         .navigationBarTitleDisplayMode(.inline)
+
+        // MARK: - Delete Confirmation
+        .alert("Удалить автомобиль?", isPresented: $showDeleteAlert) {
+
+            Button("Отмена", role: .cancel) {
+                viewModel.cancelDelete()
+            }
+
+            Button("Удалить", role: .destructive) {
+                let isDeleted = viewModel.deleteCar(
+                    using: modelContext
+                )
+
+                if !isDeleted {
+                    pendingErrorAlert = true
+                }
+            }
+        }
+
+        // MARK: - Delete Error
+        .alert(
+            "Не удалось удалить автомобиль",
+            isPresented: $showErrorAlert
+        ) {
+            Button("Понятно", role: .cancel) {}
+        } message: {
+            Text(viewModel.errorMessage)
+        }
+
+        // MARK: - Alert Coordination
+        .onChange(of: showDeleteAlert) { _, isPresented in
+            if !isPresented && pendingErrorAlert {
+                pendingErrorAlert = false
+                showErrorAlert = true
+            }
+        }
     }
 
     // MARK: - Cars List
     private var carsListView: some View {
-
         CarListView(cars: cars) { car in
-            carToDelete = car
+            viewModel.requestDelete(car)
             showDeleteAlert = true
         }
         .toolbar {
@@ -52,44 +92,6 @@ struct GarageView: View {
                 .tint(AppTheme.Colors.primaryBlue)
             }
         }
-        .alert("Удалить автомобиль?", isPresented: $showDeleteAlert) {
-            Button("Отмена", role: .cancel) {}
-
-            Button("Удалить", role: .destructive) {
-                if let car = carToDelete {
-                    deleteCar(car)
-                }
-            }
-        }
-    }
-
-    // MARK: - Empty Garage
-    private var emptyGarageView: some View {
-        VStack(alignment: .center, spacing: 18) {
-            CarImageView()
-            TitleSectionView()
-            DescriptionSectionView()
-            addCarButton
-        }
-    }
-
-    // MARK: - Add Car Button
-    private var addCarButton: some View {
-        PrimaryButton(title: "Новый автомобиль") {
-            showAddCar = true
-        }
-    }
-
-    // MARK: - Actions
-    private func deleteCar(_ car: Car) {
-        modelContext.delete(car)
-
-        do {
-            try modelContext.save()
-        } catch {
-            modelContext.rollback()
-            print("Ошибка удаления автомобиля: \(error)")
-        }
     }
 }
 
@@ -98,4 +100,5 @@ struct GarageView: View {
     NavigationStack {
         GarageView()
     }
+    .modelContainer(for: Car.self, inMemory: true)
 }

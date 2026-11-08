@@ -12,7 +12,7 @@ struct CarListView: View {
             Section("Мои автомобили") {
                 ForEach(cars) { car in
                     NavigationLink {
-                        Text("\(car.brand) \(car.model)")
+                        CarDetailView(car: car)
                     } label: {
                         CarRowView(
                             title: car.brand,
