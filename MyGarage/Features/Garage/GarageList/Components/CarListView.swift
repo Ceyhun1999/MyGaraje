@@ -4,6 +4,8 @@ struct CarListView: View {
 
     // MARK: - Data
     let cars: [Car]
+
+    // MARK: - Actions
     let onDelete: (Car) -> Void
 
     // MARK: - Body

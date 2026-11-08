@@ -6,6 +6,8 @@ struct PrimaryButton: View {
     let title: String
     var color: Color = AppTheme.Colors.primaryBlue
     var textColor: Color = .white
+
+    // MARK: - Actions
     let action: () -> Void
 
     // MARK: - Body

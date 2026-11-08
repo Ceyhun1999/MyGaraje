@@ -19,7 +19,7 @@ final class GarageListViewModel {
         carToDelete = nil
     }
 
-    func deleteCar(using modelContext: ModelContext) -> Bool{
+    func deleteCar(using modelContext: ModelContext) -> Bool {
         defer {
             cancelDelete()
         }

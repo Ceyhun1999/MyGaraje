@@ -15,9 +15,6 @@ struct AddCarView: View {
     @State private var showErrorAlert = false
     @State private var errorMessage = ""
 
-    // MARK: - Data
-    private let catalog = CarCatalog()
-
     // MARK: - Body
     var body: some View {
         NavigationStack {
@@ -27,13 +24,13 @@ struct AddCarView: View {
                     selectedBrand: $viewModel.selectedBrand,
                     selectedModel: $viewModel.selectedModel,
                     selectedYear: $viewModel.selectedYear,
-                    catalog: catalog
+                    catalog: viewModel.catalog
                 )
                 CharacteristicsSectionView(
                     selectedFuel: $viewModel.selectedFuel,
                     selectedTransmission: $viewModel.selectedTransmission,
                     mileage: $viewModel.mileage,
-                    catalog: catalog
+                    catalog: viewModel.catalog
                 )
                 buttonsSection
             }
@@ -83,37 +80,14 @@ struct AddCarView: View {
         .accessibilityLabel("Закрыть")
     }
 
+    // MARK: - Actions
     private func saveCar() {
-
-        if let error = viewModel.validate() {
+        if let error = viewModel.saveCar(using: modelContext) {
             showError(error)
             return
         }
 
-        guard let mileageValue = Int(viewModel.mileage) else {
-            showError("Введите корректный пробег")
-            return
-        }
-
-        let car = Car(
-            brand: viewModel.selectedBrand,
-            model: viewModel.selectedModel,
-            year: viewModel.selectedYear,
-            fuelType: viewModel.selectedFuel,
-            transmission: viewModel.selectedTransmission,
-            mileage: mileageValue
-        )
-
-        modelContext.insert(car)
-
-        do {
-            try modelContext.save()
-            dismiss()
-        } catch {
-            modelContext.rollback()
-            showError("Не удалось сохранить автомобиль")
-            print("Ошибка сохранения: \(error)")
-        }
+        dismiss()
     }
 
     // MARK: - Error Handling

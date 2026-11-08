@@ -1,5 +1,5 @@
-import SwiftUI
 import SwiftData
+import SwiftUI
 
 struct GarageView: View {
 
@@ -39,9 +39,8 @@ struct GarageView: View {
         .navigationTitle("Мой гараж")
         .navigationBarTitleDisplayMode(.inline)
 
-        // MARK: - Delete Confirmation
+        // Delete Confirmation
         .alert("Удалить автомобиль?", isPresented: $showDeleteAlert) {
-
             Button("Отмена", role: .cancel) {
                 viewModel.cancelDelete()
             }
@@ -57,7 +56,7 @@ struct GarageView: View {
             }
         }
 
-        // MARK: - Delete Error
+        // Delete Error
         .alert(
             "Не удалось удалить автомобиль",
             isPresented: $showErrorAlert
@@ -67,7 +66,7 @@ struct GarageView: View {
             Text(viewModel.errorMessage)
         }
 
-        // MARK: - Alert Coordination
+        // Alert Coordination
         .onChange(of: showDeleteAlert) { _, isPresented in
             if !isPresented && pendingErrorAlert {
                 pendingErrorAlert = false
