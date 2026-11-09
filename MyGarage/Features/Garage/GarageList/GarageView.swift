@@ -31,13 +31,20 @@ struct GarageView: View {
         .sheet(isPresented: $showAddCar) {
             AddCarView()
         }
-        .appScreenBackground(
-            horizontalPadding: cars.isEmpty
+        .padding(
+            .horizontal,
+            cars.isEmpty
                 ? AppTheme.Spacing.screen
                 : AppTheme.Spacing.screen - 1
         )
+        .appScreenBackground()
         .navigationTitle("Мой гараж")
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                addCarButton
+            }
+        }
 
         // Delete Confirmation
         .alert("Удалить автомобиль?", isPresented: $showDeleteAlert) {
@@ -75,21 +82,21 @@ struct GarageView: View {
         }
     }
 
+    // MARK: - Add Car Button
+    private var addCarButton: some View {
+        Button {
+            showAddCar = true
+        } label: {
+            Image(systemName: "plus")
+        }
+        .tint(AppTheme.Colors.primaryBlue)
+    }
+
     // MARK: - Cars List
     private var carsListView: some View {
         CarListView(cars: cars) { car in
             viewModel.requestDelete(car)
             showDeleteAlert = true
-        }
-        .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-                Button {
-                    showAddCar = true
-                } label: {
-                    Image(systemName: "plus")
-                }
-                .tint(AppTheme.Colors.primaryBlue)
-            }
         }
     }
 }

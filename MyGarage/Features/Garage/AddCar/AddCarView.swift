@@ -36,6 +36,8 @@ struct AddCarView: View {
                 buttonsSection
             }
             .scrollIndicators(.hidden)
+            .scrollContentBackground(.hidden)
+            .appScreenBackground()
             .navigationTitle("Новый автомобиль")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

@@ -15,6 +15,7 @@ struct CarListView: View {
                 ForEach(cars) { car in
                     NavigationLink {
                         CarDetailView(car: car)
+
                     } label: {
                         CarRowView(
                             title: car.brand,
@@ -37,5 +38,6 @@ struct CarListView: View {
         }
         .scrollContentBackground(.hidden)
         .contentMargins(.horizontal, 1, for: .scrollContent)
+        .scrollIndicators(.hidden)
     }
 }

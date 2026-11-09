@@ -8,6 +8,9 @@ struct MyGarageApp: App {
     var body: some Scene {
         WindowGroup {
             MainTabView()
+
+
+
         }
         .modelContainer(for: Car.self)
     }

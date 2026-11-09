@@ -5,6 +5,7 @@ struct DashboardView: View {
     // MARK: - Body
     var body: some View {
         Text("Dashboard")
+            .appScreenBackground()
     }
 }
 

@@ -15,26 +15,7 @@ struct PhotoSectionView: View {
             showPhotoPicker = true
         } label: {
             VStack(spacing: 10) {
-                ZStack {
-                    Circle()
-                        .fill(Color(uiColor: .systemGray5))
-
-                    if let image = viewModel.previewImage {
-                        Image(uiImage: image)
-                            .resizable()
-                            .scaledToFill()
-                            .frame(width: 80, height: 80)
-                            .clipShape(Circle())
-                    } else if viewModel.showPhotoLoader {
-                        ProgressView()
-                            .tint(.blue)
-                    } else {
-                        Image(systemName: "camera")
-                            .font(.system(size: 28))
-                            .foregroundStyle(.blue)
-                    }
-                }
-                .frame(width: 80, height: 80)
+                photoPreview
 
                 Text(photoTitle)
                     .foregroundStyle(.blue)
@@ -52,6 +33,30 @@ struct PhotoSectionView: View {
         .task(id: viewModel.selectedPhoto) {
             await viewModel.loadPhotoPreview()
         }
+    }
+
+    // MARK: - Photo Preview
+    private var photoPreview: some View {
+        ZStack {
+            Circle()
+                .fill(Color(uiColor: .systemGray5))
+
+            if let image = viewModel.previewImage {
+                Image(uiImage: image)
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: 80, height: 80)
+                    .clipShape(Circle())
+            } else if viewModel.showPhotoLoader {
+                ProgressView()
+                    .tint(.blue)
+            } else {
+                Image(systemName: "camera")
+                    .font(.system(size: 28))
+                    .foregroundStyle(.blue)
+            }
+        }
+        .frame(width: 80, height: 80)
     }
 
     // MARK: - Photo Title
