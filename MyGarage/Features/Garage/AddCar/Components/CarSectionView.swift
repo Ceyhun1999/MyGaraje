@@ -20,9 +20,6 @@ struct CarSectionView: View {
                     Text(brand).tag(brand)
                 }
             }
-            .onChange(of: selectedBrand) { _, _ in
-                selectedModel = ""
-            }
 
             Picker("Модель", selection: $selectedModel) {
                 Text("Выбрать").tag("")

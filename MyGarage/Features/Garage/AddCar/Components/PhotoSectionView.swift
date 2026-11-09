@@ -4,30 +4,64 @@ import SwiftUI
 struct PhotoSectionView: View {
 
     // MARK: - Bindings
-    @Binding var selectedPhoto: PhotosPickerItem?
+    @Bindable var viewModel: AddCarViewModel
+
+    // MARK: - State
+    @State private var showPhotoPicker = false
 
     // MARK: - Body
     var body: some View {
-        PhotosPicker(
-            selection: $selectedPhoto,
-            matching: .images
-        ) {
+        Button {
+            showPhotoPicker = true
+        } label: {
             VStack(spacing: 10) {
-                Image(systemName: "camera")
-                    .font(.system(size: 28))
-                    .foregroundStyle(.blue)
-                    .frame(width: 80, height: 80)
-                    .background(
-                        Color(uiColor: .systemGray5),
-                        in: Circle()
-                    )
+                ZStack {
+                    Circle()
+                        .fill(Color(uiColor: .systemGray5))
 
-                Text("Добавить фото")
+                    if let image = viewModel.previewImage {
+                        Image(uiImage: image)
+                            .resizable()
+                            .scaledToFill()
+                            .frame(width: 80, height: 80)
+                            .clipShape(Circle())
+                    } else if viewModel.showPhotoLoader {
+                        ProgressView()
+                            .tint(.blue)
+                    } else {
+                        Image(systemName: "camera")
+                            .font(.system(size: 28))
+                            .foregroundStyle(.blue)
+                    }
+                }
+                .frame(width: 80, height: 80)
+
+                Text(photoTitle)
                     .foregroundStyle(.blue)
             }
             .frame(maxWidth: .infinity)
         }
         .buttonStyle(.plain)
         .listRowBackground(Color.clear)
+        .disabled(viewModel.isSaving)
+        .photosPicker(
+            isPresented: $showPhotoPicker,
+            selection: $viewModel.selectedPhoto,
+            matching: .images
+        )
+        .task(id: viewModel.selectedPhoto) {
+            await viewModel.loadPhotoPreview()
+        }
+    }
+
+    // MARK: - Photo Title
+    private var photoTitle: String {
+        if viewModel.photoError != nil {
+            return "Не удалось загрузить фото"
+        }
+
+        return viewModel.previewImage == nil
+            ? "Добавить фото"
+            : "Изменить фото"
     }
 }

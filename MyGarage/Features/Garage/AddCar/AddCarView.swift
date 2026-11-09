@@ -10,7 +10,6 @@ struct AddCarView: View {
 
     // MARK: - State
     @State private var viewModel = AddCarViewModel()
-    @State private var selectedPhoto: PhotosPickerItem?
     @State private var showErrorAlert = false
     @State private var errorMessage = ""
 
@@ -18,9 +17,7 @@ struct AddCarView: View {
     var body: some View {
         NavigationStack {
             Form {
-                PhotoSectionView(
-                    selectedPhoto: $selectedPhoto
-                )
+                PhotoSectionView(viewModel: viewModel)
 
                 CarSectionView(
                     selectedBrand: $viewModel.selectedBrand,
@@ -65,12 +62,13 @@ struct AddCarView: View {
     // MARK: - Buttons Section
     private var buttonsSection: some View {
         VStack(spacing: 12) {
-            PrimaryButton(title: "Сохранить") {
-                Task {
-                    await saveCar()
-                }
+            PrimaryButton(
+                title: "Сохранить",
+                isLoading: viewModel.isSaving
+            ) {
+                saveCar()
             }
-            .disabled(viewModel.isSaving)
+            .disabled(viewModel.isLoadingPhoto)
         }
         .padding(.top, 12)
         .listRowBackground(Color.clear)
@@ -89,11 +87,8 @@ struct AddCarView: View {
 
     // MARK: - Actions
     @MainActor
-    private func saveCar() async {
-        if let error = await viewModel.saveCar(
-            using: modelContext,
-            selectedPhoto: selectedPhoto
-        ) {
+    private func saveCar() {
+        if let error = viewModel.saveCar(using: modelContext) {
             showError(error)
             return
         }

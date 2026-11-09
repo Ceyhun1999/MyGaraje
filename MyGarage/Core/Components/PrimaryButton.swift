@@ -4,8 +4,10 @@ struct PrimaryButton: View {
 
     // MARK: - Properties
     let title: String
+
     var color: Color = AppTheme.Colors.primaryBlue
     var textColor: Color = .white
+    var isLoading: Bool = false
 
     // MARK: - Actions
     let action: () -> Void
@@ -15,21 +17,36 @@ struct PrimaryButton: View {
         Button {
             action()
         } label: {
-            Text(title)
-                .font(AppTheme.Fonts.button)
-                .foregroundStyle(textColor)
-                .frame(maxWidth: .infinity)
-                .frame(height: 54)
-                .background(color)
-                .clipShape(Capsule())
+            HStack(spacing: 8) {
+                if isLoading {
+                    ProgressView()
+                        .tint(textColor)
+                }
+
+                Text(isLoading ? "Сохранение..." : title)
+                    .font(AppTheme.Fonts.button)
+            }
+            .foregroundStyle(textColor)
+            .frame(maxWidth: .infinity)
+            .frame(height: 54)
+            .background(color)
+            .clipShape(Capsule())
         }
+        .disabled(isLoading)
     }
 }
 
 // MARK: - Preview
 #Preview {
-    PrimaryButton(title: "Test button") {
-        print("test")
+    VStack(spacing: 16) {
+        PrimaryButton(title: "Сохранить") {
+            print("Сохранить")
+        }
+
+        PrimaryButton(
+            title: "Сохранить",
+            isLoading: true
+        ) {}
     }
     .padding(AppTheme.Spacing.screen)
 }
