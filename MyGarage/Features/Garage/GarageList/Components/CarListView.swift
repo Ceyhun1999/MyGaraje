@@ -1,6 +1,9 @@
 import SwiftUI
+import SwiftData
 
 struct CarListView: View {
+
+    @Environment(AppRouter.self) private var router
 
     // MARK: - Data
     let cars: [Car]
@@ -13,18 +16,18 @@ struct CarListView: View {
         List {
             Section("Мои автомобили") {
                 ForEach(cars) { car in
-                    NavigationLink {
-                        CarDetailView(car: car)
-
+                    Button {
+                        router.push(.carDetail(car.persistentModelID))
                     } label: {
                         CarRowView(
-                            title: car.brand,
+                            brand: car.brand,
                             model: car.model,
                             year: car.year,
                             mileage: car.mileage,
                             photoData: car.photoData
                         )
                     }
+                    .buttonStyle(.plain)
                     .swipeActions(edge: .trailing, allowsFullSwipe: false) {
                         Button {
                             onDelete(car)

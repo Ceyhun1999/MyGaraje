@@ -5,6 +5,7 @@ struct GarageView: View {
 
     // MARK: - Environment
     @Environment(\.modelContext) private var modelContext
+    @Environment(AppRouter.self) private var router
 
     // MARK: - Data
     @Query private var cars: [Car]
@@ -12,7 +13,6 @@ struct GarageView: View {
     // MARK: - State
     @State private var viewModel = GarageListViewModel()
 
-    @State private var showAddCar = false
     @State private var showDeleteAlert = false
     @State private var showErrorAlert = false
     @State private var pendingErrorAlert = false
@@ -22,14 +22,11 @@ struct GarageView: View {
         Group {
             if cars.isEmpty {
                 EmptyGarageSectionView {
-                    showAddCar = true
+                    router.isAddingCar = true
                 }
             } else {
                 carsListView
             }
-        }
-        .sheet(isPresented: $showAddCar) {
-            AddCarView()
         }
         .padding(
             .horizontal,
@@ -85,7 +82,7 @@ struct GarageView: View {
     // MARK: - Add Car Button
     private var addCarButton: some View {
         Button {
-            showAddCar = true
+            router.isAddingCar = true
         } label: {
             Image(systemName: "plus")
         }
@@ -103,7 +100,7 @@ struct GarageView: View {
 
 // MARK: - Preview
 #Preview {
-    NavigationStack {
+    AppNavigationStack {
         GarageView()
     }
     .modelContainer(for: Car.self, inMemory: true)

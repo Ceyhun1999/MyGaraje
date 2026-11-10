@@ -3,7 +3,7 @@ import SwiftUI
 struct CarRowView: View {
 
     // MARK: - Data
-    let title: String
+    let brand: String
     let model: String
     let year: Int
     let mileage: Int
@@ -18,7 +18,7 @@ struct CarRowView: View {
                 .clipShape(RoundedRectangle(cornerRadius: 12))
 
             VStack(alignment: .leading, spacing: 5) {
-                Text("\(title) \(model)")
+                Text("\(brand) \(model)")
                     .font(.system(size: 17, weight: .semibold))
 
                 Text("\(String(year)) · \(mileage.formatted()) км")

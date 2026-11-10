@@ -5,6 +5,7 @@ struct MainTabView: View {
     // MARK: - State
     @State private var selectedTab = 0
 
+
     // MARK: - Body
     var body: some View {
         TabView(selection: $selectedTab) {
@@ -16,7 +17,7 @@ struct MainTabView: View {
             }
             .tag(0)
 
-            NavigationStack {
+            AppNavigationStack {
                 GarageView()
             }
             .tabItem {

@@ -1,6 +1,9 @@
 import SwiftUI
+import SwiftData
 
 struct CarDetailView: View {
+    
+    @Environment(AppRouter.self) private var router
 
     // MARK: - Data
     let car: Car
@@ -30,6 +33,16 @@ struct CarDetailView: View {
         .scrollIndicators(.hidden)
         .padding(.horizontal, AppTheme.Spacing.screen)
         .appScreenBackground()
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    router.push(.editCar(car.persistentModelID))
+                } label: {
+                    Text("Изменить")
+                }
+
+            }
+        }
     }
 
     // MARK: - Summary Section
