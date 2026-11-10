@@ -10,6 +10,8 @@ struct EditCarView: View {
     // MARK: - ViewModel
 
     @State private var viewModel: EditCarViewModel
+    
+    @Environment(\.modelContext) private var modelContext
 
     // MARK: - Init
 
@@ -52,7 +54,7 @@ struct EditCarView: View {
             )
 
             PrimaryButton(title: "Сохранить") {
-                // Подключим сохранение следующим шагом
+                viewModel.saveChanges(using: modelContext)
             }
             .disabled(true)
             .padding(.top, 12)

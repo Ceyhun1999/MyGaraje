@@ -8,11 +8,6 @@ import UIKit
 @Observable
 final class AddCarViewModel {
 
-    // MARK: - Types
-    enum ValidationResult {
-        case valid(mileage: Int)
-        case invalid(String)
-    }
 
     // MARK: - Data
     let catalog = CarCatalog()
@@ -195,33 +190,14 @@ final class AddCarViewModel {
     }
 
     // MARK: - Validation
-    func validate() -> ValidationResult {
-        guard !selectedBrand.isEmpty else {
-            return .invalid("Выберите марку автомобиля")
-        }
-
-        guard !selectedModel.isEmpty else {
-            return .invalid("Выберите модель автомобиля")
-        }
-
-        guard selectedYear > 0 else {
-            return .invalid("Выберите год выпуска")
-        }
-
-        guard !selectedFuel.isEmpty else {
-            return .invalid("Выберите тип топлива")
-        }
-
-        guard !selectedTransmission.isEmpty else {
-            return .invalid("Выберите коробку передач")
-        }
-
-        guard let mileageValue = Int(mileage),
-            mileageValue >= 0
-        else {
-            return .invalid("Введите корректный пробег")
-        }
-
-        return .valid(mileage: mileageValue)
+    func validate() -> CarValidator.ValidationResult {
+       return CarValidator.validate(
+            brand: selectedBrand,
+            model: selectedModel,
+            year: selectedYear,
+            fuel: selectedFuel,
+            transmission: selectedTransmission,
+            mileage: mileage
+        )
     }
 }

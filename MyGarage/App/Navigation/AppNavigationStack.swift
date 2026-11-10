@@ -14,7 +14,6 @@ struct AppNavigationStack<Content: View>: View {
     }
 
     var body: some View {
-        @Bindable var router = router
 
         NavigationStack(path: $router.path) {
             content
